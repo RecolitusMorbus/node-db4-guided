@@ -12,7 +12,7 @@ exports.up = function(knex) {
       
       tbl.string('name', 255).notNullable();
       tbl
-        .integer() // Define our Foreign Key
+        .integer('species_id') // Define our Foreign Key
         .unsigned()
         .references('id')
         .inTable('species')
@@ -22,25 +22,36 @@ exports.up = function(knex) {
     .createTable('animals_zoos', tbl => {
       tbl.increments();
 
+      tbl.string('name', 255).notNullable();
       tbl
-        .integer()
+        .integer('zoo_id')
         .references('id')
         .inTable('zoos')
+        .onDelete('RESTRICT')
+        .onUpdate('CASCADE')
         .notNullable();
       tbl
-        .integer()
+        .integer('animal_id')
         .references('id')
         .inTable('animals')
+        .onDelete('RESTRICT')
+        .onUpdate('CASCADE')
         .notNullable();
+      tbl.date('from').notNullable();
+      tbl.date('to');
     })
     .createTable('zoos', tbl => {
       tbl.increments();
 
-      tbl.string('name').notNullable();
-      tbl.string('address');
+      tbl.string('name', 255).notNullable();
+      tbl.string('address', 255);
     });
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTableIfExists('species')
+  return knex.schema
+    .dropTableIfExists('species')
+    .dropTableIfExists('animals')
+    .dropTableIfExists('animals_zoos')
+    .dropTableIfExists('zoos');
 };
